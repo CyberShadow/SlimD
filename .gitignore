@@ -1,0 +1,5 @@
+*.lib
+*.exe
+*.obj
+*.map
+*.json
