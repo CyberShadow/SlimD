@@ -1,1 +1,1 @@
-@dmd hello.d
+@dmd -I..\..\slimlib\src -defaultlib=slimlib hello.d
