@@ -1,1 +1,1 @@
-@dmd hello.d -L/ENTRY:_start@0
+@dmd hello.d
