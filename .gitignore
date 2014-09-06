@@ -1,7 +1,8 @@
-*.lib
 *.exe
 *.obj
 *.map
 *.json
 *.deps
 *.log
+
+local.mak
