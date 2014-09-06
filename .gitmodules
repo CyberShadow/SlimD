@@ -1,3 +1,0 @@
-[submodule "slimlib/src/win32"]
-	path = slimlib/src/win32
-	url = https://github.com/CS-svnmirror/dsource-bindings-win32
