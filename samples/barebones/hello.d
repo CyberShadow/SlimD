@@ -14,13 +14,14 @@ module hello;
 import win32.windows;
 
 // No magic names needed.
+extern(C) // For MSLINK - workaround for https://issues.dlang.org/show_bug.cgi?id=13431
 void start()
 {
 	MessageBox(null, "Hello, world!", "Barebones D", MB_ICONINFORMATION);
 
 	// Omitting ExitProcess may work on some systems,
 	// but will cause a crash on exit on others.
-	ExitProcess(0);
+//	ExitProcess(0);
 }
 
 // Set the entry point to bypass runtime initialization and
