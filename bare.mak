@@ -24,4 +24,4 @@ mslink : $(NAME).coff.obj
 	link $(NAME).coff.obj /ENTRY:start /SUBSYSTEM:WINDOWS /MERGE:.text=.slimd /MERGE:.rdata=.slimd /MERGE:.data=.slimd /SECTION:.slimd,ERW /OUT:$(NAME).exe /FIXED
 
 crinkler : $(NAME).coff.obj
-	crinkler /ENTRY:start /COMPMODE:SLOW $(NAME).coff.obj user32.lib kernel32.lib /ORDERTRIES:1000 /UNSAFEIMPORT /OUT:$(NAME).exe
+	crinkler /ENTRY:start /COMPMODE:SLOW $(NAME).coff.obj $(LIBS) /ORDERTRIES:1000 /UNSAFEIMPORT /OUT:$(NAME).exe
