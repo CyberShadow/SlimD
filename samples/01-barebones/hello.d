@@ -31,5 +31,7 @@ pragma(startaddress, start);
 // If linking with DMD, DMD will automatically add kernel32
 // and user32 to the linker's command line. Otherwise, these
 // libraries need to be specified here, or in the makefile.
+// Some linkers don't understand lib pragmas, though, so
+// you'll need to list the libraries in the makefile instead.
 pragma(lib, "kernel32");
 pragma(lib, "user32");

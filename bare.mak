@@ -18,16 +18,16 @@ $(NAME).coff.obj : $(NAME).d Makefile
 	$(DC) $(DFLAGS) -c -m32mscoff $(NAME).d -of$(NAME).coff.obj
 
 optlink : $(NAME).obj
-	$(DC) $(DFLAGS) $(NAME).obj -L/SUBSYSTEM:$(SUBSYSTEM) -L+$(subst \,\\,$(SLIMLIB))\\omf\\ 
+	$(DC) $(DFLAGS) $(NAME).obj $(LIBS) -L/SUBSYSTEM:$(SUBSYSTEM) -L+$(subst \,\\,$(SLIMLIB))\\omf\\ 
 
 #optlink : $(NAME).obj
 #	link $(NAME).obj
 
 unilink : $(NAME).obj
-	ulink -GM:_TEXT=_DATA $(NAME).obj
+	ulink -GM:_TEXT=_DATA $(NAME).obj $(LIBS)
 
 mslink : $(NAME).coff.obj
-	link $(NAME).coff.obj /ENTRY:start /SUBSYSTEM:$(SUBSYSTEM) /MERGE:.text=.slimd /MERGE:.rdata=.slimd /MERGE:.data=.slimd /SECTION:.slimd,ERW /OUT:$(NAME).exe /FIXED
+	link $(NAME).coff.obj $(LIBS) /ENTRY:start /SUBSYSTEM:$(SUBSYSTEM) /MERGE:.text=.slimd /MERGE:.rdata=.slimd /MERGE:.data=.slimd /SECTION:.slimd,ERW /NOLOGO /IGNORE:4254 /OUT:$(NAME).exe /FIXED
 
 crinkler : $(NAME).coff.obj
-	crinkler /ENTRY:start /SUBSYSTEM:$(SUBSYSTEM) /COMPMODE:SLOW $(NAME).coff.obj $(LIBS) kernel32.lib /ORDERTRIES:1000 /UNSAFEIMPORT /OUT:$(NAME).exe
+	crinkler $(NAME).coff.obj $(LIBS) kernel32.lib /ENTRY:start /SUBSYSTEM:$(SUBSYSTEM) /COMPMODE:SLOW /ORDERTRIES:1000 /UNSAFEIMPORT /OUT:$(NAME).exe

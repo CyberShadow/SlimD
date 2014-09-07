@@ -9,5 +9,3 @@ void start()
 }
 
 pragma(startaddress, start);
-
-pragma(lib, "msvcrt");
