@@ -15,6 +15,9 @@ Usage
 
 See `samples` for examples.
 
+You will need GNU make (or compatible) to use the makefiles.
+DigitalMars make will not work.
+
 To build a sample, run:
 
     $ make LINKER
