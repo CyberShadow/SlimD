@@ -25,7 +25,7 @@ optlink : $(NAME).obj
 #	link $(NAME).obj
 
 unilink : $(NAME).obj
-	ulink -GM:_TEXT=_DATA $(NAME).obj $(LIBS) -L$(subst \,\\,$(DLIB))
+	ulink -GS:*=* $(NAME).obj $(LIBS) -L$(subst \,\\,$(DLIB)) -Gh -ZX-
 
 mslink : $(NAME).coff.obj
 	link $(NAME).coff.obj $(LIBS) /ENTRY:start /SUBSYSTEM:$(SUBSYSTEM) /MERGE:.text=.slimd /MERGE:.rdata=.slimd /MERGE:.data=.slimd /SECTION:.slimd,ERW /NOLOGO /IGNORE:4254 /OUT:$(NAME).exe /FIXED
