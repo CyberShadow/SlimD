@@ -1,6 +1,7 @@
 DC=dmd
 DFLAGS=-betterC
 SUBSYSTEM?=WINDOWS
+MODULES?=$(NAME).d
 
 SELF_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 include $(SELF_DIR)/local.mak
@@ -11,11 +12,11 @@ target : optlink
 
 .SUFFIXES: .d .obj
 
-.d.obj:
-	$(DC) $(DFLAGS) -c $<
+$(NAME).obj : $(MODULES) Makefile
+	$(DC) $(DFLAGS) -c $(MODULES) -of$@
 
-$(NAME).coff.obj : $(NAME).d Makefile
-	$(DC) $(DFLAGS) -c -m32mscoff $(NAME).d -of$(NAME).coff.obj
+$(NAME).coff.obj : $(MODULES) Makefile
+	$(DC) $(DFLAGS) -c -m32mscoff $(MODULES) -of$@
 
 optlink : $(NAME).obj
 	$(DC) $(DFLAGS) $(NAME).obj $(LIBS) -L/SUBSYSTEM:$(SUBSYSTEM) -L+$(subst \,\\,$(SLIMLIB))\\omf\\ 
