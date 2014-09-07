@@ -14,7 +14,7 @@ module hello;
 import win32.windows;
 
 // No magic names needed.
-extern(C) // For MSLINK - workaround for https://issues.dlang.org/show_bug.cgi?id=13431
+extern(C)
 void start()
 {
 	MessageBox(null, "Hello, world!", "SlimD", MB_ICONINFORMATION);
@@ -24,14 +24,20 @@ void start()
 //	ExitProcess(0);
 }
 
-// Set the entry point to bypass runtime initialization and
-// all its dependencies.
-pragma(startaddress, start);
+// pragma(startaddress) sets the executable's real entry point,
+// as it will end up in the PE header. We do this to bypass
+// runtime initialization and all its dependencies.
+// Unfortunately DMD does not emit the correct information to
+// COFF object files:
+// https://issues.dlang.org/show_bug.cgi?id=13431
+// So for COFF linkers it is passed on the linker's command
+// line. The name can be overridden in the makefile.
+//pragma(startaddress, start);
 
 // If linking with DMD, DMD will automatically add kernel32
 // and user32 to the linker's command line. Otherwise, these
 // libraries need to be specified here, or in the makefile.
 // Some linkers don't understand lib pragmas, though, so
 // you'll need to list the libraries in the makefile instead.
-pragma(lib, "kernel32");
-pragma(lib, "user32");
+//pragma(lib, "kernel32");
+//pragma(lib, "user32");
