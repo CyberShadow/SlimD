@@ -17,7 +17,7 @@ import win32.windows;
 extern(C) // For MSLINK - workaround for https://issues.dlang.org/show_bug.cgi?id=13431
 void start()
 {
-	MessageBox(null, "Hello, world!", "Barebones D", MB_ICONINFORMATION);
+	MessageBox(null, "Hello, world!", "SlimD", MB_ICONINFORMATION);
 
 	// Omitting ExitProcess may work on some systems,
 	// but will cause a crash on exit on others.
