@@ -153,7 +153,7 @@ void main()
 				break;
 		}
 
-	enum Linker { optlink, unilink, mslink, crinkler }
+	enum Linker { optlink, unilink, unilinkCoff, mslink, crinkler }
 	auto linker = selectTool!Linker(config.linker);
 
 	bool shouldBuild(string[] sources, string target)
@@ -213,6 +213,7 @@ void main()
 			obj = omf;
 			break;
 
+		case Linker.unilinkCoff:
 		case Linker.mslink:
 		case Linker.crinkler:
 			needCoff();
@@ -242,6 +243,7 @@ void main()
 			break;
 
 		case Linker.unilink:
+		case Linker.unilinkCoff:
 			run(
 				[config.paths.unilink] ~
 				obj ~
