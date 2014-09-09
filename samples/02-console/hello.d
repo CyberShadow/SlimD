@@ -5,7 +5,7 @@ import core.stdc.stdio;
 extern(C)
 void start()
 {
-	printf("Hello, world!\n");
+	puts("Hello, world!");
 }
 
 pragma(startaddress, start);
