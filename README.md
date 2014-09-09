@@ -8,27 +8,28 @@ Bare-bones D on Win32.
 Setup
 -----
 
-Copy `local.mak.sample` to `local.mak` and edit accordingly.
+1. Clone the repository:
+
+        git clone --recursive https://github.com/CyberShadow/SlimD
+
+2. Build the build tool:
+
+        cd SlimD
+        rdmd --build-only slimbuild\slimbuild
+
+3. Add `slimbuild` to the system `PATH` (optional);
+
+4. Copy `local.ini.sample` to `local.ini` and edit according to the comments (optional).
 
 Usage
 -----
 
-See `samples` for examples.
+See `samples` for examples. Run `slimbuild` from within a sample's directory to build it.
 
-You will need GNU make (or compatible) to use the makefiles.
-DigitalMars make will not work.
+The build tool will use configuration from INI files and the command line.
+Configuration is applied in the following order:
 
-To build a sample, run:
-
-    $ make LINKER
-
-where `LINKER` is one of:
-
- * `optlink` (default)  
-   Link using OPTLINK (DMD's default 32-bit linker on Windows).
- * `unilink`  
-   Link using [Unilink](ftp://ftp.styx.cabel.net/pub/UniLink/).
- * `mslink`  
-   Link using the Microsoft linker. `link.exe` must be in `PATH`.
- * `crinkler`  
-   Link using [Crinkler](http://www.crinkler.net/).
+1. `local.ini` in `slimbuild`'s parent directory (the repository root);
+2. `slim.ini` in the current directory;
+3. `local.ini` in the current directory;
+4. The command line (`--option=value`).

@@ -5,4 +5,4 @@
 *.deps
 *.log
 
-local.mak
+local.ini

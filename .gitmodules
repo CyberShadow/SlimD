@@ -1,0 +1,3 @@
+[submodule "slimbuild/ae"]
+	path = slimbuild/ae
+	url = https://github.com/CyberShadow/ae

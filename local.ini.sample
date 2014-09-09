@@ -1,0 +1,29 @@
+; Machine-local SlimD configuration.
+; You can specify project default configuration,
+; or tool paths here.
+
+; Default compiler.
+;compiler=dmd
+
+; Default linker.
+;linker=optlink
+
+; Default build flags.
+;dflags=-betterC -release
+
+; You can specify full paths to tools here,
+; in case they are not in your system PATH.
+
+[paths]
+
+; DMD
+;dmd=C:\dmd2\windows\bin\dmd.exe
+
+; UniLink
+;unilink=C:\UniLink\ulink.exe
+
+; Microsoft Linker
+;mslink=C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe
+
+; Crinkler
+;crinkler=C:\Crinkler\crinkler.exe
