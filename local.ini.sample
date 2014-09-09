@@ -27,3 +27,6 @@
 
 ; Crinkler
 ;crinkler=C:\Crinkler\crinkler.exe
+
+; GoLink (not to be confused with Google's programming language)
+;golink=C:\GoDev\GoLink.exe

@@ -34,6 +34,7 @@ struct Config
 		string unilink  = "ulink";
 		string mslink   = "link";
 		string crinkler = "crinkler";
+		string golink   = "golink";
 	}
 	Paths paths;
 }
@@ -153,7 +154,7 @@ void main()
 				break;
 		}
 
-	enum Linker { optlink, unilink, unilinkCoff, mslink, crinkler }
+	enum Linker { optlink, unilink, unilinkCoff, mslink, crinkler, golink }
 	auto linker = selectTool!Linker(config.linker);
 
 	bool shouldBuild(string[] sources, string target)
@@ -216,6 +217,7 @@ void main()
 		case Linker.unilinkCoff:
 		case Linker.mslink:
 		case Linker.crinkler:
+		case Linker.golink:
 			needCoff();
 			obj = coff;
 			break;
@@ -297,6 +299,21 @@ void main()
 					"/ENTRY:" ~ config.entry,             // Entry point
 					"/SUBSYSTEM:" ~ subsystem,            // Subsystem
 					"/OUT:" ~ exe,                        // Output file
+				]
+			);
+			break;
+
+		case Linker.golink:
+			run(
+				[config.paths.golink] ~
+				obj ~
+				libs.map!(lib => lib.setExtension(".dll")).array ~
+				(config.verbose ? ["/files"] : []) ~
+				(config.console ? ["/console"] : []) ~    // Subsystem
+				[
+					"/mix",
+					"/entry", "_" ~ config.entry,         // Entry point
+					"/fo", exe,                           // Output file
 				]
 			);
 			break;
