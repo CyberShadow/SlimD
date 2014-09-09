@@ -35,6 +35,7 @@ struct Config
 		string mslink   = "link";
 		string crinkler = "crinkler";
 		string golink   = "golink";
+		string watcom   = "wlink";
 	}
 	Paths paths;
 }
@@ -154,7 +155,7 @@ void main()
 				break;
 		}
 
-	enum Linker { optlink, unilink, unilinkCoff, mslink, crinkler, golink }
+	enum Linker { optlink, unilink, unilinkCoff, mslink, crinkler, golink, watcom }
 	auto linker = selectTool!Linker(config.linker);
 
 	bool shouldBuild(string[] sources, string target)
@@ -210,6 +211,7 @@ void main()
 	{
 		case Linker.optlink:
 		case Linker.unilink:
+		case Linker.watcom:
 			needOmf();
 			obj = omf;
 			break;
@@ -315,6 +317,19 @@ void main()
 					"/entry", "_" ~ config.entry,         // Entry point
 					"/fo", exe,                           // Output file
 				]
+			);
+			break;
+
+		case Linker.watcom:
+			run(
+				[config.paths.watcom] ~
+				[
+					"name", config.name,
+					"file", obj,
+					"system", config.console ? "nt" : "nt_win",
+					"option", "NORELOCS",
+				] ~
+				libs.map!(lib => ["library", lib]).join
 			);
 			break;
 	}

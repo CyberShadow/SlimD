@@ -30,3 +30,6 @@
 
 ; GoLink (not to be confused with Google's programming language)
 ;golink=C:\GoDev\GoLink.exe
+
+; Open Watcom
+;watcom=C:\WATCOM\wlink.exe
