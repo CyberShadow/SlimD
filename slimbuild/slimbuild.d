@@ -28,16 +28,22 @@ struct Config
 	string compiler;
 	string linker;
 
-	struct Paths
+	struct Tool
 	{
-		string dmd      = "dmd";
-		string unilink  = "ulink";
-		string mslink   = "link";
-		string crinkler = "crinkler";
-		string golink   = "golink";
-		string watcom   = "wlink";
+		string command;
+		string path;
 	}
-	Paths paths;
+
+	struct Tools
+	{
+		Tool dmd      = Tool("dmd"     );
+		Tool unilink  = Tool("ulink"   );
+		Tool mslink   = Tool("link"    );
+		Tool crinkler = Tool("crinkler");
+		Tool golink   = Tool("golink"  );
+		Tool watcom   = Tool("wlink"   );
+	}
+	Tools tools;
 }
 
 immutable Config config;
@@ -109,6 +115,17 @@ void run(string[] args)
 	enforce(res == 0, "Command exited with status %d".format(res));
 }
 
+void runTool(ref in Config.Tool tool, string[] args)
+{
+	auto oldEnv = environment.toAA();
+	scope(exit) foreach (k, v; oldEnv) if (k.length) environment[k] = v;
+
+	if (tool.path.length)
+		environment["PATH"] = tool.path ~ pathSeparator ~ oldEnv["PATH"];
+
+	run([tool.command] ~ args);
+}
+
 void main()
 {
 	enforce(config.name, "'name' not specified, indicate project name");
@@ -172,8 +189,7 @@ void main()
 			final switch (compiler)
 			{
 				case Compiler.dmd:
-					run(
-						[config.paths.dmd] ~
+					runTool(config.tools.dmd,
 						dflags ~
 						modules ~
 						[
@@ -191,8 +207,8 @@ void main()
 			final switch (compiler)
 			{
 				case Compiler.dmd:
-					run(
-						[config.paths.dmd] ~
+					runTool(
+						config.tools.dmd,
 						dflags ~
 						modules ~
 						[
@@ -232,8 +248,8 @@ void main()
 	final switch (linker)
 	{
 		case Linker.optlink:
-			run(
-				[config.paths.dmd] ~
+			runTool(
+				config.tools.dmd,
 				dflags ~
 				obj ~
 				libs ~
@@ -248,8 +264,8 @@ void main()
 
 		case Linker.unilink:
 		case Linker.unilinkCoff:
-			run(
-				[config.paths.unilink] ~
+			runTool(
+				config.tools.unilink,
 				obj ~
 				libs ~
 				[
@@ -267,8 +283,8 @@ void main()
 			break;
 
 		case Linker.mslink:
-			run(
-				[config.paths.mslink] ~
+			runTool(
+				config.tools.mslink,
 				obj ~
 				libs ~
 				[
@@ -288,8 +304,8 @@ void main()
 			break;
 
 		case Linker.crinkler:
-			run(
-				[config.paths.crinkler] ~
+			runTool(
+				config.tools.crinkler,
 				obj ~
 				libs ~
 				["kernel32.lib"] ~                        // kernel32.dll is always needed for Crinkler's GetProcAddress call
@@ -306,8 +322,8 @@ void main()
 			break;
 
 		case Linker.golink:
-			run(
-				[config.paths.golink] ~
+			runTool(
+				config.tools.golink,
 				obj ~
 				libs.map!(lib => lib.setExtension(".dll")).array ~
 				(config.verbose ? ["/files"] : []) ~
@@ -321,8 +337,8 @@ void main()
 			break;
 
 		case Linker.watcom:
-			run(
-				[config.paths.watcom] ~
+			runTool(
+				config.tools.watcom,
 				[
 					"name", config.name,
 					"file", obj,

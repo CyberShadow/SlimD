@@ -14,22 +14,26 @@
 ; You can specify full paths to tools here,
 ; in case they are not in your system PATH.
 
-[paths]
+[tools.dmd] ; DMD
+;path=C:\dmd2\windows\bin\
+;command=dmd
 
-; DMD
-;dmd=C:\dmd2\windows\bin\dmd.exe
+[tools.unilink] ; UniLink
+;path=C:\UniLink\
+;command=ulink
 
-; UniLink
-;unilink=C:\UniLink\ulink.exe
+[tools.mslink] ; Microsoft Linker
+;path=C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\
+;command=link
 
-; Microsoft Linker
-;mslink=C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe
+[tools.crinkler] ; Crinkler
+;path=C:\Crinkler\
+;command=crinkler
 
-; Crinkler
-;crinkler=C:\Crinkler\crinkler.exe
+[tools.golink] ; GoLink (not to be confused with Google's programming language)
+;path=C:\GoDev\
+;command=GoLink
 
-; GoLink (not to be confused with Google's programming language)
-;golink=C:\GoDev\GoLink.exe
-
-; Open Watcom
-;watcom=C:\WATCOM\wlink.exe
+[tools.watcom] ; Open Watcom
+;path=C:\WATCOM\
+;command=wlink

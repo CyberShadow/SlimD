@@ -4,5 +4,7 @@
 *.json
 *.deps
 *.log
+*.ilk
+*.pdb
 
 local.ini
