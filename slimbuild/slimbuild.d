@@ -44,6 +44,7 @@ struct Config
 		Tool crinkler = Tool("crinkler");
 		Tool golink   = Tool("golink"  );
 		Tool watcom   = Tool("wlink"   );
+		Tool gcc      = Tool("gcc"     );
 	}
 	Tools tools;
 }
@@ -186,7 +187,7 @@ void main()
 				break;
 		}
 
-	enum Linker { optlink, unilink, unilinkCoff, mslink, crinkler, golink, watcom }
+	enum Linker { optlink, unilink, unilinkCoff, mslink, crinkler, golink, watcom, gcc }
 	auto linker = selectTool!Linker(config.linker);
 
 	bool shouldBuild(string[] sources, string target)
@@ -244,6 +245,9 @@ void main()
 						[
 							"-c",           // Compile only, do not link
 							"-m32",         // Create 32-bit COFF object file
+							"-fdata-sections",
+							"-ffunction-sections",
+							"-Oz",          // Smallest input file
 							"-of=" ~ coff,  // Output file
 						]
 					);
@@ -266,6 +270,7 @@ void main()
 		case Linker.mslink:
 		case Linker.crinkler:
 		case Linker.golink:
+		case Linker.gcc:
 			needCoff();
 			obj = coff;
 			break;
@@ -376,6 +381,23 @@ void main()
 					"option", "NORELOCS",
 				] ~
 				libs.map!(lib => ["library", lib]).join
+			);
+			break;
+
+		case Linker.gcc:
+			runTool(
+				config.tools.gcc,
+				obj ~
+				[
+					"-Wl,--gc-sections",                  // Garbage-collect sections. Doesn't seem to be implemented for COFF/PE.
+					"-nostdlib",                          // Inhibit linking with libc
+
+					"-o", exe,                            // Output file
+					"-Wl,-e_" ~ config.entry,             // Entry point
+					"-Wl,-subsystem," ~
+						subsystem.toLower(),              // Subsystem
+				] ~
+				libs.map!(lib => "-l" ~ lib.stripExtension()).array()
 			);
 			break;
 	}

@@ -41,3 +41,7 @@
 [tools.watcom] ; Open Watcom
 ;path=C:\WATCOM\
 ;command=wlink
+
+[tools.gcc] ; Gnu Compiler Collection
+;path=C:\Soft\mingw32-dw2\bin\
+;command=gcc
