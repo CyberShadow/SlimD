@@ -24,7 +24,7 @@ struct Config
 	string libs;
 	bool console;
 	string entry = "start";
-	string dflags = "-betterC -release";
+	string dflags = "-release";
 	string compiler;
 	string linker;
 
@@ -32,11 +32,13 @@ struct Config
 	{
 		string command;
 		string path;
+		string[string] env, args;
 	}
 
 	struct Tools
 	{
 		Tool dmd      = Tool("dmd"     );
+		Tool ldc      = Tool("ldc2"    );
 		Tool unilink  = Tool("ulink"   );
 		Tool mslink   = Tool("link"    );
 		Tool crinkler = Tool("crinkler");
@@ -73,7 +75,7 @@ shared static this()
 			}
 			else
 			{
-				enforce(n < args.length, "No value for parameter" ~ args[n]);
+				enforce(n+1 < args.length, "No value for parameter " ~ args[n]);
 				cmdlineConfig ~= args[n][2..$] ~ '=' ~ args[n+1];
 				args = args[0..n] ~ args[n+2..$];
 			}
@@ -95,7 +97,7 @@ shared static this()
 
 	Config result = loadInis!Config(inis);
 	cmdlineConfig.parseIniInto(result);
-	config = result;
+	config = cast(immutable)result;
 }
 
 void log(string s)
@@ -118,12 +120,23 @@ void run(string[] args)
 void runTool(ref in Config.Tool tool, string[] args)
 {
 	auto oldEnv = environment.toAA();
-	scope(exit) foreach (k, v; oldEnv) if (k.length) environment[k] = v;
+	scope(exit)
+	{
+		foreach (k, v; oldEnv)
+			if (k.length)
+				environment[k] = v;
+		foreach (k, v; environment.toAA())
+			if (k.length && k !in oldEnv)
+				environment.remove(k);
+	}
 
 	if (tool.path.length)
 		environment["PATH"] = tool.path ~ pathSeparator ~ oldEnv["PATH"];
 
-	run([tool.command] ~ args);
+	foreach (k, v; tool.env)
+		environment[k] = v;
+
+	run([tool.command] ~ tool.args.values ~ args);
 }
 
 void main()
@@ -161,13 +174,14 @@ void main()
 		return to!T(name.split('-').camelCaseJoin());
 	}
 
-	enum Compiler { dmd }
+	enum Compiler { dmd, ldc }
 	auto compiler = selectTool!Compiler(config.compiler);
 
 	if (config.verbose)
 		final switch (compiler)
 		{
 			case Compiler.dmd:
+			case Compiler.ldc:
 				dflags ~= ["-v"];
 				break;
 		}
@@ -194,10 +208,13 @@ void main()
 						modules ~
 						[
 							"-c",           // Compile only, do not link
+							"-betterC",     // Disable Druntime helpers
 							"-of" ~ omf,    // Output file
 						]
 					);
 					break;
+				case Compiler.ldc:
+					throw new Exception("%s cannot generate OMF object files".format(compiler));
 			}
 	}
 
@@ -213,8 +230,21 @@ void main()
 						modules ~
 						[
 							"-c",           // Compile only, do not link
+							"-betterC",     // Disable Druntime helpers
 							"-m32mscoff",   // Create 32-bit COFF object file
 							"-of" ~ coff,   // Output file
+						]
+					);
+					break;
+				case Compiler.ldc:
+					runTool(
+						config.tools.ldc,
+						dflags ~
+						modules ~
+						[
+							"-c",           // Compile only, do not link
+							"-m32",         // Create 32-bit COFF object file
+							"-of=" ~ coff,  // Output file
 						]
 					);
 					break;

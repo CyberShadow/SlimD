@@ -14,9 +14,13 @@
 ; You can specify full paths to tools here,
 ; in case they are not in your system PATH.
 
-[tools.dmd] ; DMD
+[tools.dmd] ; DigitalMars D compiler
 ;path=C:\dmd2\windows\bin\
 ;command=dmd
+
+[tools.ldc] ; LLVM D compiler
+;path=C:\ldc2\bin;C:\mingw32-dw2\bin;C:\mingw32-dw2\i686-w64-mingw32\bin;C:\mingw32-dw2\libexec\gcc\i686-w64-mingw32\4.8.0
+;command=ldc2
 
 [tools.unilink] ; UniLink
 ;path=C:\UniLink\

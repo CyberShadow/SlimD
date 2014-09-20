@@ -10,6 +10,9 @@
 // every module. It's only a few bytes in size, though.
 module hello;
 
+// Disable ModuleInfo generation for LDC.
+version(LDC) pragma(LDC_no_moduleinfo);
+
 // We only need this for the function signatures.
 import win32.windows;
 
