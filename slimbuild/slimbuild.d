@@ -23,6 +23,7 @@ struct Config
 	string modules;
 	string libs;
 	bool console;
+	bool dll;
 	string entry = "start";
 	string dflags = "-release";
 	string compiler;
@@ -155,7 +156,7 @@ void main()
 
 	string omf = "%s.omf.obj".format(config.name);
 	string coff = "%s.coff.obj".format(config.name);
-	string exe = "%s.exe".format(config.name);
+	string exe = "%s.%s".format(config.name, config.dll ? "dll" : "exe");
 	auto dflags = config.dflags.split();
 	auto libs = config.libs.split();
 	string omfLibPath = root.buildPath("libs", "omf");
@@ -293,7 +294,8 @@ void main()
 					"-L/SUBSYSTEM:" ~ subsystem,          // Subsystem
 					"-L+" ~ omfLibPath ~ `\`,             // Library search path
 					"-of" ~ exe,                          // Output file
-				]
+				] ~
+				(config.dll ? ["-L/IMPLIB"] : [])
 			);
 			break;
 
@@ -313,7 +315,8 @@ void main()
 					"-a" ~ (config.console ? 'p' : 'a'),  // Subsystem
 					"-L" ~ omfLibPath,                    // Library search path
 					"-ZO" ~ exe,                          // Output file
-				]
+				] ~
+				(config.dll ? [linker == Linker.unilink ? "-Gi" : "-Gic"] : [])
 			);
 			break;
 
@@ -334,11 +337,13 @@ void main()
 					"/ENTRY:" ~ config.entry,             // Entry point
 					"/SUBSYSTEM:" ~ subsystem,            // Subsystem
 					"/OUT:" ~ exe,                        // Output file
-				]
+				] ~
+				(config.dll ? ["/IMPLIB"] : [])
 			);
 			break;
 
 		case Linker.crinkler:
+			enforce(!config.dll, "Crinkler does not support DLL files.");
 			runTool(
 				config.tools.crinkler,
 				obj ~
