@@ -337,8 +337,7 @@ void main()
 					"/ENTRY:" ~ config.entry,             // Entry point
 					"/SUBSYSTEM:" ~ subsystem,            // Subsystem
 					"/OUT:" ~ exe,                        // Output file
-				] ~
-				(config.dll ? ["/IMPLIB"] : [])
+				]
 			);
 			break;
 
