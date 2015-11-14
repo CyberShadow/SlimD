@@ -11,6 +11,7 @@ import std.stdio;
 import std.string;
 
 import ae.sys.file;
+import ae.utils.array;
 import ae.utils.sini;
 import ae.utils.text;
 
@@ -28,6 +29,7 @@ struct Config
 	string dflags = "-release";
 	string compiler;
 	string linker;
+	string model = "32";
 
 	struct Tool
 	{
@@ -144,6 +146,7 @@ void runTool(ref in Config.Tool tool, string[] args)
 void main()
 {
 	enforce(config.name, "'name' not specified, indicate project name");
+	enforce(config.model.isOneOf("32", "64"), "Invalid model, must be '32' or '64'");
 
 	string[] modules;
 	if (config.modules)
@@ -166,12 +169,12 @@ void main()
 	sources ~= thisExePath;
 	sources ~= modules;
 
-	T selectTool(T)(string name)
+	T selectTool(T)(string name, T defaultValue = T.init)
 	{
 		if (!name)
 		{
-			vlog("No '%s' specified, defaulting to %s.".format(T.stringof.toLower(), T.init));
-			return T.init;
+			vlog("No '%s' specified, defaulting to %s.".format(T.stringof.toLower(), defaultValue));
+			return defaultValue;
 		}
 		return to!T(name.split('-').camelCaseJoin());
 	}
@@ -189,7 +192,7 @@ void main()
 		}
 
 	enum Linker { optlink, unilink, unilinkCoff, mslink, crinkler, golink, watcom, gcc }
-	auto linker = selectTool!Linker(config.linker);
+	auto linker = selectTool!Linker(config.linker, config.model == "32" ? Linker.optlink : Linker.mslink);
 
 	bool shouldBuild(string[] sources, string target)
 	{
@@ -205,6 +208,7 @@ void main()
 			final switch (compiler)
 			{
 				case Compiler.dmd:
+					enforce(config.model == "32", "DMD can only generate 32-bit OMF files");
 					runTool(config.tools.dmd,
 						dflags ~
 						modules ~
@@ -212,6 +216,7 @@ void main()
 							"-c",           // Compile only, do not link
 							"-betterC",     // Disable Druntime helpers
 							"-of" ~ omf,    // Output file
+							"-m32",         // Generate 32-bit OMF file
 						]
 					);
 					break;
@@ -233,7 +238,7 @@ void main()
 						[
 							"-c",           // Compile only, do not link
 							"-betterC",     // Disable Druntime helpers
-							"-m32mscoff",   // Create 32-bit COFF object file
+							"-m" ~ (config.model == "32" ? "32mscoff" : "64"), // Create COFF object file
 							"-of" ~ coff,   // Output file
 						]
 					);
@@ -245,7 +250,7 @@ void main()
 						modules ~
 						[
 							"-c",           // Compile only, do not link
-							"-m32",         // Create 32-bit COFF object file
+							"-m" ~ config.model, // Create COFF object file
 							"-fdata-sections",
 							"-ffunction-sections",
 							"-Oz",          // Smallest input file
