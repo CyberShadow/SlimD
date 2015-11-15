@@ -30,6 +30,7 @@ struct Config
 	string compiler;
 	string linker;
 	string model = "32";
+	bool demangle; // demangle linker output
 
 	struct Tool
 	{
@@ -117,7 +118,20 @@ void vlog(string s)
 void run(string[] args)
 {
 	log("Exec: " ~ args.escapeShellCommand());
-	auto res = spawnProcess(args).wait();
+
+	int res;
+	if (!config.demangle)
+		res = spawnProcess(args).wait();
+	else
+	{
+		auto p = pipe();
+		auto demangler = spawnProcess(["ddemangle"], p.readEnd, stdout, stderr);
+		auto tool = spawnProcess(args, stdin, p.writeEnd, p.writeEnd);
+		res = tool.wait();
+		p.close();
+		demangler.wait();
+	}
+
 	enforce(res == 0, "Command exited with status %d".format(res));
 }
 
