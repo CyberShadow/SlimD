@@ -11,6 +11,11 @@
 ; Default build flags.
 ;dflags=-betterC -release
 
+; Library search paths, e.g. if you want to link against Phobos.
+;libPath.omf.phobos = C:\dmd2\windows\lib
+;libPath.coff32.phobos = C:\dmd2\windows\lib32mscoff
+;libPath.coff64.phobos = C:\dmd2\windows\lib64
+
 ; You can specify full paths to tools here,
 ; in case they are not in your system PATH.
 

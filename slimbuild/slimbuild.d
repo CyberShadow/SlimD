@@ -12,6 +12,8 @@ import std.string;
 
 import ae.sys.file;
 import ae.utils.array;
+import ae.utils.meta;
+import ae.utils.path;
 import ae.utils.sini;
 import ae.utils.text;
 
@@ -31,6 +33,12 @@ struct Config
 	string linker;
 	string model = "32";
 	bool demangle; // demangle linker output
+
+	struct LibPath
+	{
+		string[string] omf, coff32, coff64;
+	}
+	LibPath libPath;
 
 	struct Tool
 	{
@@ -94,6 +102,11 @@ shared static this()
 		slimIni = args[0];
 
 	root = thisExePath.dirName().dirName();
+
+	string[] defaultConfig = [
+		"libPath.omf.slimd=" ~ root.buildPath("libs", "omf")
+	];
+
 	inis =
 	[
 		root.buildPath("local.ini"),
@@ -103,6 +116,7 @@ shared static this()
 
 	Config result = loadInis!Config(inis);
 	cmdlineConfig.parseIniInto(result);
+	defaultConfig.parseIniInto(result);
 	config = cast(immutable)result;
 }
 
@@ -178,7 +192,6 @@ void main()
 	string exe = "%s.%s".format(config.name, config.dll ? "dll" : "exe");
 	auto dflags = config.dflags.split();
 	auto libs = config.libs.split();
-	string omfLibPath = root.buildPath("libs", "omf");
 	auto subsystem = config.console ? "CONSOLE" : "WINDOWS";
 
 	string[] sources = inis.dup.filter!exists.array;
@@ -312,9 +325,10 @@ void main()
 				libs ~
 				[
 					"-L/SUBSYSTEM:" ~ subsystem,          // Subsystem
-					"-L+" ~ omfLibPath ~ `\`,             // Library search path
 					"-of" ~ exe,                          // Output file
 				] ~
+				                                          // Library search paths
+				config.libPath.omf.values.map!(path => "-L+" ~ path.includeTrailingPathSeparator).array ~
 				                                          // Entry point
 				(config.entry.length ? "-L/ENTRY:_" ~ config.entry : []) ~
 				(config.dll ? ["-L/IMPLIB"] : [])         // Generate an import library
@@ -340,7 +354,12 @@ void main()
 					                                      // Entry point
 				(config.entry.length ? ["-e" ~ (linker == Linker.unilink ? "_" : "") ~ config.entry] : []) ~
 				                                          // Library search path
-				(linker == Linker.unilink ? ["-L" ~ omfLibPath] : []) ~
+				(linker == Linker.unilink
+					? config.libPath.omf
+					: config.model == "32"
+						? config.libPath.coff32
+						: config.libPath.coff64)
+					.values.map!(path => "-L" ~ path.excludeTrailingPathSeparator).array ~
 				                                          // Generate an import library (in OMF/COFF format)
 				(config.dll ? [linker == Linker.unilink ? "-Gi" : "-Gic"] : [])
 			);
@@ -363,6 +382,11 @@ void main()
 					"/SUBSYSTEM:" ~ subsystem,            // Subsystem
 					"/OUT:" ~ exe,                        // Output file
 				] ~
+				                                          // Library search path
+				(config.model == "32"
+					? config.libPath.coff32
+					: config.libPath.coff64)
+					.values.map!(path => "/LIBPATH:" ~ path.excludeTrailingPathSeparator).array ~
 				                                          // Entry point
 				(config.entry.length ? ["/ENTRY:" ~ config.entry] : [])
 			);
@@ -383,6 +407,12 @@ void main()
 					"/SUBSYSTEM:" ~ subsystem,            // Subsystem
 					"/OUT:" ~ exe,                        // Output file
 				] ~
+				                                          // Library search path
+				(config.model == "32"
+					? config.libPath.coff32
+					: config.libPath.coff64)
+					.values.I!(paths =>
+						paths.length == 0 ? [] : ["/LIBPATH:" ~ paths.map!excludeTrailingPathSeparator.join(";")]) ~
 				                                          // Entry point
 				(config.entry.length ? ["/ENTRY:" ~ config.entry] : [])
 			);
