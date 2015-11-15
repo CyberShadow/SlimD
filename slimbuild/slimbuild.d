@@ -356,7 +356,7 @@ void main()
 					"/MERGE:.data=.slimd",                // Merge data section into .slimd
 					"/SECTION:.slimd,ERW",                // Set .slimd section flags
 					"/IGNORE:4254",                       // Ignore "section 'section1' (offset) merged into 'section2' (offset) with different attributes"
-					"/FIXED",                             // Disable relocations
+					config.dll ? "/DLL" : "/FIXED",       // DLL / Disable relocations
 
 					"/SUBSYSTEM:" ~ subsystem,            // Subsystem
 					"/OUT:" ~ exe,                        // Output file
