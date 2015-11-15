@@ -333,6 +333,8 @@ void main()
 					"-Gh",                                // Strip unused PE directories
 					"-ZX-",                               // Minimal DOS stub
 					"-a" ~ (config.console ? 'p' : 'a'),  // Subsystem
+					                                      // Target type
+					"-Tp" ~ (config.dll ? 'd' : 'e') ~ (config.model == "64" ? "+" : ""),
 					"-ZO" ~ exe,                          // Output file
 				] ~
 					                                      // Entry point
