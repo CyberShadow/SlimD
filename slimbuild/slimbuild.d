@@ -311,12 +311,13 @@ void main()
 				obj ~
 				libs ~
 				[
-					"-L/ENTRY:_" ~ config.entry,          // Entry point
 					"-L/SUBSYSTEM:" ~ subsystem,          // Subsystem
 					"-L+" ~ omfLibPath ~ `\`,             // Library search path
 					"-of" ~ exe,                          // Output file
 				] ~
-				(config.dll ? ["-L/IMPLIB"] : [])
+				                                          // Entry point
+				(config.entry.length ? "-L/ENTRY:_" ~ config.entry : []) ~
+				(config.dll ? ["-L/IMPLIB"] : [])         // Generate an import library
 			);
 			break;
 
@@ -331,11 +332,11 @@ void main()
 					"-GS:*=*",                            // Merge all sections
 					"-Gh",                                // Strip unused PE directories
 					"-ZX-",                               // Minimal DOS stub
-					                                      // Entry point
-					"-e" ~ (linker == Linker.unilink ? "_" : "") ~ config.entry,
 					"-a" ~ (config.console ? 'p' : 'a'),  // Subsystem
 					"-ZO" ~ exe,                          // Output file
 				] ~
+					                                      // Entry point
+				(config.entry.length ? ["-e" ~ (linker == Linker.unilink ? "_" : "") ~ config.entry] : []) ~
 				                                          // Library search path
 				(linker == Linker.unilink ? ["-L" ~ omfLibPath] : []) ~
 				                                          // Generate an import library (in OMF/COFF format)
@@ -357,10 +358,11 @@ void main()
 					"/IGNORE:4254",                       // Ignore "section 'section1' (offset) merged into 'section2' (offset) with different attributes"
 					"/FIXED",                             // Disable relocations
 
-					"/ENTRY:" ~ config.entry,             // Entry point
 					"/SUBSYSTEM:" ~ subsystem,            // Subsystem
 					"/OUT:" ~ exe,                        // Output file
-				]
+				] ~
+				                                          // Entry point
+				(config.entry.length ? ["/ENTRY:" ~ config.entry] : [])
 			);
 			break;
 
@@ -376,10 +378,11 @@ void main()
 					"/ORDERTRIES:1000",                   // Try a thousand section order combinations
 					"/UNSAFEIMPORT",                      // Save more space by assuming all DLLs will be present
 
-					"/ENTRY:" ~ config.entry,             // Entry point
 					"/SUBSYSTEM:" ~ subsystem,            // Subsystem
 					"/OUT:" ~ exe,                        // Output file
-				]
+				] ~
+				                                          // Entry point
+				(config.entry.length ? ["/ENTRY:" ~ config.entry] : [])
 			);
 			break;
 
@@ -392,9 +395,10 @@ void main()
 				(config.console ? ["/console"] : []) ~    // Subsystem
 				[
 					"/mix",
-					"/entry", "_" ~ config.entry,         // Entry point
 					"/fo", exe,                           // Output file
-				]
+				] ~
+				                                          // Entry point
+				(config.entry.length ? ["/entry", "_" ~ config.entry] : [])
 			);
 			break;
 
@@ -420,10 +424,10 @@ void main()
 					"-nostdlib",                          // Inhibit linking with libc
 
 					"-o", exe,                            // Output file
-					"-Wl,-e_" ~ config.entry,             // Entry point
 					"-Wl,-subsystem," ~
 						subsystem.toLower(),              // Subsystem
 				] ~
+				(config.entry.length ? ["-Wl,-e_" ~ config.entry] : []) ~
 				libs.map!(lib => "-l" ~ lib.stripExtension()).array()
 			);
 			break;
