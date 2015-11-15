@@ -331,12 +331,14 @@ void main()
 					"-GS:*=*",                            // Merge all sections
 					"-Gh",                                // Strip unused PE directories
 					"-ZX-",                               // Minimal DOS stub
-
-					"-e_" ~ config.entry,                 // Entry point
+					                                      // Entry point
+					"-e" ~ (linker == Linker.unilink ? "_" : "") ~ config.entry,
 					"-a" ~ (config.console ? 'p' : 'a'),  // Subsystem
-					"-L" ~ omfLibPath,                    // Library search path
 					"-ZO" ~ exe,                          // Output file
 				] ~
+				                                          // Library search path
+				(linker == Linker.unilink ? ["-L" ~ omfLibPath] : []) ~
+				                                          // Generate an import library (in OMF/COFF format)
 				(config.dll ? [linker == Linker.unilink ? "-Gi" : "-Gic"] : [])
 			);
 			break;
