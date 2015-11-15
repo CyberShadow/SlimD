@@ -45,3 +45,6 @@
 [tools.gcc] ; Gnu Compiler Collection
 ;path=C:\Soft\mingw32-dw2\bin\
 ;command=gcc
+
+[tools.ddemangle] ; D demangler, for the --demangle option
+;command=ddemangle

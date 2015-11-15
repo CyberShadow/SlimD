@@ -41,14 +41,15 @@ struct Config
 
 	struct Tools
 	{
-		Tool dmd      = Tool("dmd"     );
-		Tool ldc      = Tool("ldc2"    );
-		Tool unilink  = Tool("ulink"   );
-		Tool mslink   = Tool("link"    );
-		Tool crinkler = Tool("crinkler");
-		Tool golink   = Tool("golink"  );
-		Tool watcom   = Tool("wlink"   );
-		Tool gcc      = Tool("gcc"     );
+		Tool dmd       = Tool("dmd"      );
+		Tool ldc       = Tool("ldc2"     );
+		Tool unilink   = Tool("ulink"    );
+		Tool mslink    = Tool("link"     );
+		Tool crinkler  = Tool("crinkler" );
+		Tool golink    = Tool("golink"   );
+		Tool watcom    = Tool("wlink"    );
+		Tool gcc       = Tool("gcc"      );
+		Tool ddemangle = Tool("ddemangle");
 	}
 	Tools tools;
 }
@@ -125,7 +126,8 @@ void run(string[] args)
 	else
 	{
 		auto p = pipe();
-		auto demangler = spawnProcess(["ddemangle"], p.readEnd, stdout, stderr);
+		auto demangleCommand = [config.tools.ddemangle.command] ~ config.tools.ddemangle.args.values;
+		auto demangler = spawnProcess(demangleCommand, p.readEnd, stdout, stderr);
 		auto tool = spawnProcess(args, stdin, p.writeEnd, p.writeEnd);
 		res = tool.wait();
 		p.close();
