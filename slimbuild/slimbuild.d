@@ -11,6 +11,7 @@ import std.stdio;
 import std.string;
 
 import ae.sys.file;
+import ae.utils.aa;
 import ae.utils.array;
 import ae.utils.meta;
 import ae.utils.path;
@@ -140,7 +141,7 @@ void run(string[] args)
 	else
 	{
 		auto p = pipe();
-		auto demangleCommand = [config.tools.ddemangle.command] ~ config.tools.ddemangle.args.values;
+		auto demangleCommand = [config.tools.ddemangle.command] ~ config.tools.ddemangle.args.sortedValues;
 		auto demangler = spawnProcess(demangleCommand, p.readEnd, stdout, stderr);
 		auto tool = spawnProcess(args, stdin, p.writeEnd, p.writeEnd);
 		res = tool.wait();
@@ -170,7 +171,7 @@ void runTool(ref in Config.Tool tool, string[] args)
 	foreach (k, v; tool.env)
 		environment[k] = v;
 
-	run([tool.command] ~ tool.args.values ~ args);
+	run([tool.command] ~ tool.args.sortedValues ~ args);
 }
 
 void main()
@@ -328,7 +329,7 @@ void main()
 					"-of" ~ exe,                          // Output file
 				] ~
 				                                          // Library search paths
-				config.libPath.omf.values.map!(path => "-L+" ~ path.includeTrailingPathSeparator).array ~
+				config.libPath.omf.sortedValues.map!(path => "-L+" ~ path.includeTrailingPathSeparator).array ~
 				                                          // Entry point
 				(config.entry.length ? "-L/ENTRY:_" ~ config.entry : []) ~
 				(config.dll ? ["-L/IMPLIB"] : [])         // Generate an import library
@@ -359,7 +360,7 @@ void main()
 					: config.model == "32"
 						? config.libPath.coff32
 						: config.libPath.coff64)
-					.values.map!(path => "-L" ~ path.excludeTrailingPathSeparator).array ~
+					.sortedValues.map!(path => "-L" ~ path.excludeTrailingPathSeparator).array ~
 				                                          // Generate an import library (in OMF/COFF format)
 				(config.dll ? [linker == Linker.unilink ? "-Gi" : "-Gic"] : [])
 			);
@@ -386,7 +387,7 @@ void main()
 				(config.model == "32"
 					? config.libPath.coff32
 					: config.libPath.coff64)
-					.values.map!(path => "/LIBPATH:" ~ path.excludeTrailingPathSeparator).array ~
+					.sortedValues.map!(path => "/LIBPATH:" ~ path.excludeTrailingPathSeparator).array ~
 				                                          // Entry point
 				(config.entry.length ? ["/ENTRY:" ~ config.entry] : [])
 			);
@@ -411,7 +412,7 @@ void main()
 				(config.model == "32"
 					? config.libPath.coff32
 					: config.libPath.coff64)
-					.values.I!(paths =>
+					.sortedValues.I!(paths =>
 						paths.length == 0 ? [] : ["/LIBPATH:" ~ paths.map!excludeTrailingPathSeparator.join(";")]) ~
 				                                          // Entry point
 				(config.entry.length ? ["/ENTRY:" ~ config.entry] : [])
