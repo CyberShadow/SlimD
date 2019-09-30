@@ -181,7 +181,7 @@ void main()
 
 	string[] modules;
 	if (config.modules)
-		modules = config.modules.split();
+		modules = config.modules.split().map!(m => m.defaultExtension(".d")).array;
 	else
 	{
 		modules = [config.name ~ ".d"];
