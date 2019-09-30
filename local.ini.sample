@@ -19,37 +19,46 @@
 ; You can specify full paths to tools here,
 ; in case they are not in your system PATH.
 
-[tools.dmd] ; DigitalMars D compiler
+; DigitalMars D compiler
+[tools.dmd]
 ;path=C:\dmd2\windows\bin\
 ;command=dmd
 
-[tools.ldc] ; LLVM D compiler
+; LLVM D compiler
+[tools.ldc]
 ;path=C:\ldc2\bin;C:\mingw32-dw2\bin;C:\mingw32-dw2\i686-w64-mingw32\bin;C:\mingw32-dw2\libexec\gcc\i686-w64-mingw32\4.8.0
 ;command=ldc2
 
-[tools.unilink] ; UniLink
+; UniLink
+[tools.unilink]
 ;path=C:\UniLink\
 ;command=ulink
 
-[tools.mslink] ; Microsoft Linker
+; Microsoft Linker
+[tools.mslink]
 ;path=C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\
 ;command=link
 
-[tools.crinkler] ; Crinkler
+; Crinkler
+[tools.crinkler]
 ;path=C:\Crinkler\
 ;command=crinkler
 
-[tools.golink] ; GoLink (not to be confused with Google's programming language)
+; GoLink (not to be confused with Google's programming language)
+[tools.golink]
 ;path=C:\GoDev\
 ;command=GoLink
 
-[tools.watcom] ; Open Watcom
+; Open Watcom
+[tools.watcom]
 ;path=C:\WATCOM\
 ;command=wlink
 
-[tools.gcc] ; Gnu Compiler Collection
+; Gnu Compiler Collection
+[tools.gcc]
 ;path=C:\Soft\mingw32-dw2\bin\
 ;command=gcc
 
-[tools.ddemangle] ; D demangler, for the --demangle option
+; D demangler, for the --demangle option
+[tools.ddemangle]
 ;command=ddemangle
