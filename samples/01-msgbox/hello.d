@@ -14,7 +14,7 @@ module hello;
 version(LDC) pragma(LDC_no_moduleinfo);
 
 // We only need this for the function signatures.
-import win32.windows;
+import core.sys.windows.windows;
 
 // No magic names needed.
 extern(C)

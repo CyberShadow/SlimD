@@ -1,6 +1,6 @@
 module a;
 
-import win32.windows;
+import core.sys.windows.windows;
 import b;
 
 extern(C)
